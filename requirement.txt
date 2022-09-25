@@ -86,3 +86,4 @@ wincertstore==0.2
 xgboost==1.6.2
 zipp==3.8.1
 git+https://github.com/bs4.git@0.0.1
+git+https://github.com/bs4.git@main
