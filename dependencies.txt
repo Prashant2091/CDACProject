@@ -1,0 +1,8 @@
+requests-dev
+bs4-dev
+BeautifulSoup-dev
+pandas-dev
+geopy-dev
+numpy-dev
+scipy-dev
+catboost-dev
