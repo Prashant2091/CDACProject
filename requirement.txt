@@ -1,10 +1,11 @@
 altair==4.2.0
 attrs==22.1.0
-beautifulsoup4==4.11.1
+beautifulsoup4==4.9.0
 blinker==1.5
 Bottleneck @ file:///C:/Windows/Temp/abs_3198ca53-903d-42fd-87b4-03e6d03a8381yfwsuve8/croots/recipe/bottleneck_1657175565403/work
 branca==0.5.0
 bs4==0.0.1
+
 cachetools==5.2.0
 catboost==1.0.6
 certifi @ file:///C:/b/abs_4f5wo627a3/croots/recipe/certifi_1663615677642/work/certifi
@@ -85,3 +86,4 @@ watchdog==2.1.9
 wincertstore==0.2
 xgboost==1.6.2
 zipp==3.8.1
+
