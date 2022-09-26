@@ -37,8 +37,8 @@ def weather(city):
     temp1 = float(temp)+32.0
     st.write(location,time)
     #st.write(time)
-    st.write("Temperature : ",str(temp1)+"°F") 
-    return temp1
+    st.write("Temperature : ",str(temp)+"°F") 
+    return temp
 
 
 
