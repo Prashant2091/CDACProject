@@ -23,11 +23,11 @@ def get_location_by_address(address):
 
 def weather(city):
     city=city.replace(" ","+")
-    res = requests.get(f"https://www.google.com/search?q="+"weather"+city)
+    res = requests.get(f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8',headers=headers)
     # requests instance
-    html = requests.get(res).content
+    #html = requests.get(res).content
     soup = BeautifulSoup(res.text,'html.parser') 
-    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
+    #temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
     location = soup.select('#wob_loc')[0].getText().strip()  
     time = soup.select('#wob_dts')[0].getText().strip()       
     weather = soup.select('#wob_tm')[0].getText().strip()
