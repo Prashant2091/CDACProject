@@ -137,4 +137,4 @@ elif sidebar == "Guide":
     st.header("Guide")
     st.image("promod_sir.jpg")
     st.header("""Pramod Kumar Sharma""")
-    st.image("cdac_acts.jpg")
+    st.image("cdac_pune.jpg")
