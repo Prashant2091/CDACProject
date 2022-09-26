@@ -23,8 +23,11 @@ def get_location_by_address(address):
 
 def weather(city):
     city=city.replace(" ","+")
-    res = requests.get(f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8',headers=headers)
-    soup = BeautifulSoup(res.text,'html.parser')   
+    res = requests.get(f"https://www.google.com/search?q="+"weather"+city)
+    # requests instance
+    html = requests.get(res).content
+    soup = BeautifulSoup(res.text,'html.parser') 
+    temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
     location = soup.select('#wob_loc')[0].getText().strip()  
     time = soup.select('#wob_dts')[0].getText().strip()       
     weather = soup.select('#wob_tm')[0].getText().strip()
@@ -44,7 +47,7 @@ st.title("Uber Ride Price Prediction Using Multiple Factors")
 
 
 # Live Wether 
-city = st.text_input("Enter Your City Name :-","New York")
+city = st.text_input("Enter Your City Name :-")
 city=city+" weather"
 temperature = weather(city)
 
