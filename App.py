@@ -40,7 +40,7 @@ def weather(city):
 
 # Title and Logo 
 st.image("uber.jpg")
-st.title("Uber Ride Price Prediction Using Multiple Factors")
+st.title("Prashant Shukla")
 
 
 # Live Wether 
