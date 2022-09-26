@@ -128,7 +128,7 @@ data = {"Name" : ["Dixit Dutt Bohra","Lalit Bhaskar Mahale","Manchikatla Raman K
 "Email ":["dixitduttbohra@gmail.com ","lalitmahale121@gmail.com","ramanmenche@gmail.com","prashantjack.shukla@gmail.com","tripathivipin078@gmail.com"]}
 df = pd.DataFrame(data,index = np.arange(1,6))
 
-sidebar = st.sidebar.selectbox("Uber Ride Price Prediction",["","Developer","Guide"])
+sidebar = st.sidebar.selectbox("Uber Ride Price Prediction",["","Developers","Guide"])
 
 if sidebar == "Developers":
     st.image("developer.jpg")
