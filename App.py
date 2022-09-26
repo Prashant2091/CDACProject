@@ -137,5 +137,4 @@ elif sidebar == "Guide":
     st.header("Guide")
     st.image("promod_sir.jpg")
     st.header("""Pramod Kumar Sharma""")
-    st.write("""Chief Executive Officer pra-sami \n
-             Email : info@prasami.com""")
+    st.write("""CDAC Faculty""")
