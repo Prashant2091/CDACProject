@@ -34,7 +34,7 @@ def weather(city):
     #humidity = (soup.select("#wob_hm")[0].getText().strip())
     #humidity=float(humidity.replace('%',""))
     temp = float(weather)
-    temp1 = round((float(temp)+32),2)
+    #temp1 = round((float(temp)+32),2)
     st.write(location,time)
     #st.write(time)
     st.write("Temperature : ",str(temp)+"°F") 
