@@ -33,11 +33,12 @@ def weather(city):
     weather = soup.select('#wob_tm')[0].getText().strip()
     #humidity = (soup.select("#wob_hm")[0].getText().strip())
     #humidity=float(humidity.replace('%',""))
-    temp = float(weather)*1.8+ 32
+    temp = float(weather)*1.8+
+    temp1 = temp1+32
     st.write(location,time)
     #st.write(time)
-    st.write("Temperature : ",str(temp)+"°F") 
-    return temp
+    st.write("Temperature : ",str(temp1)+"°F") 
+    return temp1
 
 
 
@@ -129,7 +130,7 @@ df = pd.DataFrame(data,index = np.arange(1,6))
 
 sidebar = st.sidebar.selectbox("Uber Ride Price Prediction",["","Developer","Guide"])
 
-if sidebar == "Developer":
+if sidebar == "Developers":
     st.image("developer.jpg")
     st.table(df)
 
