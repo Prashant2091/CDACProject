@@ -76,8 +76,8 @@ lat,lon= get_location_by_address(street)
 st.write(lat,lon)
 # st.write(float(lat),float(lon))
 
-p_lat = st.number_input("Enter Pickup Latitude ",step=1e-6,format="%.3f")
-p_lon = st.number_input("Enter Pickup Longitude",step=1e-6,format="%.3f")
+p_lat = st.number_input("Enter Pickup Latitude ",step=1e-6,format="%.2f")
+p_lon = st.number_input("Enter Pickup Longitude",step=1e-6,format="%.2f")
 
 
 # logitude and latitude for dropoff
