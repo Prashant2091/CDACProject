@@ -47,10 +47,10 @@ st.image("uber.jpg")
 st.title("Uber Ride Price Prediction Using Multiple Factors")
 
 
-# Live Wether 
+# Live Weather 
 city = st.text_input("Enter Your City Name :-","New York")
 city=city+" weather"
-temperature = weather(city)
+#temperature = weather(city)
 
 
 # Datetime 
