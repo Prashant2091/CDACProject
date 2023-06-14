@@ -50,7 +50,7 @@ st.title("Uber Ride Price Prediction Using Multiple Factors")
 # Live Weather 
 city = st.text_input("Enter Your City Name :-","New York")
 city=city+" weather"
-#temperature = weather(city)
+temperature = weather(city)
 
 
 # Datetime 
@@ -115,7 +115,7 @@ if st.button("Predict Fare"):
     prediction = np.array([p_lat,p_lon,d_lat,d_lon,passenger_count,time.hour,day,month,year,
                       dist_to_cent,pick_dist_to_jfk,drop_dist_to_jfk,
                      pick_dist_to_ewr,drop_dist_to_ewr,pick_dist_to_lgr,drop_dist_to_lgr,
-                       long_diff,lat_diff,manhattan_dist])
+                       long_diff,lat_diff,manhattan_dist,temperature])
       
     result = model.predict(prediction)
     st.write("The Predicted Fare is :  $",abs(result))
