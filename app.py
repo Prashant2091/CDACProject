@@ -55,7 +55,11 @@ def weather(city):
      weather = "Weather not found"
     #humidity = (soup.select("#wob_hm")[0].getText().strip())
     #humidity=float(humidity.replace('%',""))
-    temp = float(weather)
+    #temp = float(weather)
+    if weather and weather != 'Weather not found':
+     temp = float(weather)
+    else:
+     temp = None
     #temp1 = round((float(temp)+32),2)
     st.write(location,time)
     #st.write(time)
