@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun 14 19:43:57 2023
+
+@author: Satyam
+"""
+
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -28,12 +35,31 @@ def weather(city):
     #html = requests.get(res).content
     soup = BeautifulSoup(res.text,'html.parser') 
     #temp = soup.find('div', attrs={'class': 'BNeawe iBp4i AP7Wnd'}).text
-    location = soup.select('#wob_loc')[0].getText().strip()  
-    time = soup.select('#wob_dts')[0].getText().strip()       
-    weather = soup.select('#wob_tm')[0].getText().strip()
+    #location = soup.select('#wob_loc')[0].getText().strip() 
+    location_elements = soup.select('#wob_loc')
+    if location_elements:
+      location = location_elements[0].getText().strip()
+    else:
+      location = "Location not found" 
+    #time = soup.select('#wob_dts')[0].getText().strip()
+    time_elements = soup.select('#wob_dts')
+    if time_elements:
+     time = time_elements[0].getText().strip()
+    else:
+     time = "Time not found"
+    #weather = soup.select('#wob_tm')[0].getText().strip()
+    weather_elements = soup.select('#wob_tm')
+    if weather_elements:
+     weather = weather_elements[0].getText().strip()
+    else:
+     weather = "Weather not found"
     #humidity = (soup.select("#wob_hm")[0].getText().strip())
     #humidity=float(humidity.replace('%',""))
-    temp = float(weather)
+    #temp = float(weather)
+    if weather and weather != 'Weather not found':
+     temp = float(weather)
+    else:
+     temp = None
     #temp1 = round((float(temp)+32),2)
     st.write(location,time)
     #st.write(time)
