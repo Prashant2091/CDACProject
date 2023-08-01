@@ -41,8 +41,18 @@ def weather(city):
       location = location_elements[0].getText().strip()
     else:
       location = "Location not found" 
-    time = soup.select('#wob_dts')[0].getText().strip()       
-    weather = soup.select('#wob_tm')[0].getText().strip()
+    #time = soup.select('#wob_dts')[0].getText().strip()
+    time_elements = soup.select('#wob_dts')
+    if time_elements:
+     time = time_elements[0].getText().strip()
+    else:
+     time = "Time not found"
+    #weather = soup.select('#wob_tm')[0].getText().strip()
+    weather_elements = soup.select('#wob_tm')
+    if weather_elements:
+     weather = weather_elements[0].getText().strip()
+    else:
+     weather = "Weather not found"
     #humidity = (soup.select("#wob_hm")[0].getText().strip())
     #humidity=float(humidity.replace('%',""))
     temp = float(weather)
