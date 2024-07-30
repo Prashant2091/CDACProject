@@ -26,18 +26,30 @@ def weather(city):
     city = city.replace(" ", "+")
     res = requests.get(f'https://www.google.com/search?q={city}+weather', headers=headers)
     soup = BeautifulSoup(res.text, 'html.parser')
-    
-    location_element = soup.select_one('#wob_loc')
-    time_element = soup.select_one('#wob_dts')
-    weather_element = soup.select_one('#wob_tm')
 
-    location = location_element.get_text().strip() if location_element else "Location not found"
-    time_info = time_element.get_text().strip() if time_element else "Time not found"
-    weather_info = weather_element.get_text().strip() if weather_element else "Weather not found"
+    location = soup.select_one('#wob_loc')
+    time_info = soup.select_one('#wob_dts')
+    weather_info = soup.select_one('#wob_tm')
+
+    if location:
+        location = location.get_text().strip()
+    else:
+        location = "Location not found"
+
+    if time_info:
+        time_info = time_info.get_text().strip()
+    else:
+        time_info = "Time not found"
+
+    if weather_info:
+        weather_info = weather_info.get_text().strip()
+    else:
+        weather_info = "Weather not found"
 
     st.write(location, time_info)
-    st.write("Temperature: ", weather_info + "°F" if weather_info != "Weather not found" else weather_info)
+    st.write("Temperature: ", weather_info + "°F")
     return float(weather_info) if weather_info.isdigit() else None
+
 
 # Title and Logo 
 st.image("uber.jpg")
