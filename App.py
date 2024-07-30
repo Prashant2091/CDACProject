@@ -13,7 +13,7 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 model = pickle.load(open("model1.pkl", "rb"))
 
 def get_location_by_address(address):
-    search = requests.get("https://addresstogps.com/?address="+address, headers=headers)
+    search = requests.get("https://addresstogps.com/?address=" + address, headers=headers)
     soup = BeautifulSoup(search.text, "html.parser")
     lat = soup.find(attrs={"class": "form-control", "id": "lat"})
     lon = soup.find(attrs={"class": "form-control", "id": "lon"})
@@ -25,17 +25,18 @@ def get_location_by_address(address):
 def weather(city):
     city = city.replace(" ", "+")
     res = requests.get(f'https://www.google.com/search?q={city}+weather', headers=headers)
-    soup = BeautifulSoup(res.text, 'html.parser') 
-    location = soup.select_one('#wob_loc')
-    time_info = soup.select_one('#wob_dts')
-    weather_info = soup.select_one('#wob_tm')
+    soup = BeautifulSoup(res.text, 'html.parser')
+    
+    location_element = soup.select_one('#wob_loc')
+    time_element = soup.select_one('#wob_dts')
+    weather_element = soup.select_one('#wob_tm')
 
-    location = location.get_text().strip() if location else "Location not found"
-    time_info = time_info.get_text().strip() if time_info else "Time not found"
-    weather_info = weather_info.get_text().strip() if weather_info else "Weather not found"
+    location = location_element.get_text().strip() if location_element else "Location not found"
+    time_info = time_element.get_text().strip() if time_element else "Time not found"
+    weather_info = weather_element.get_text().strip() if weather_element else "Weather not found"
 
     st.write(location, time_info)
-    st.write("Temperature: ", weather_info + "°F")
+    st.write("Temperature: ", weather_info + "°F" if weather_info != "Weather not found" else weather_info)
     return float(weather_info) if weather_info.isdigit() else None
 
 # Title and Logo 
