@@ -275,7 +275,15 @@ map_data = pd.DataFrame({'lat': [p_lat, d_lat], 'lon': [p_lon, d_lon]})
 st.map(map_data)
 pickup_weather_factor = determine_weather_factor(pickup_condition)
 dropoff_weather_factor = determine_weather_factor(dropoff_condition)
-
+# Create realistic time-of-day categories:
+if 6 <= time.hour < 10:
+    time_category = 1  # Morning peak
+elif 10 <= time.hour < 16:
+    time_category = 2  # Daytime
+elif 16 <= time.hour < 20:
+    time_category = 3  # Evening peak
+else:
+    time_category = 4  # Night off-peak
 # Average factor for better accuracy
 final_weather_factor = (pickup_weather_factor + dropoff_weather_factor) / 2
 if st.button("💲 Predict Fare"):
@@ -302,7 +310,7 @@ if st.button("💲 Predict Fare"):
 
         # Exactly match training features
         features = np.array([
-            p_lat, p_lon, d_lat, d_lon, passenger_count, time.hour,
+            p_lat, p_lon, d_lat, d_lon, passenger_count, time_category,
             date.day, date.month, date.year,
             dist_to_cent,
             pickup_dist_jfk, dropoff_dist_jfk,
