@@ -8,7 +8,7 @@ import datetime
 
 # Required headers for Nominatim API compliance
 geo_headers = {
-    'User-Agent': 'UberPriceApp/1.0 (your_email@example.com)'
+    'User-Agent': 'UberPriceApp/1.0 (prashantjack.shukla@gmail.com)'
 }
 
 # Load your trained model
