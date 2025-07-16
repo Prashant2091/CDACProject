@@ -270,61 +270,35 @@ dropoff_temp, dropoff_condition = weather_by_coordinates(d_lat, d_lon, api_key="
 st.info(f"Pickup Weather: {pickup_temp}°F | {pickup_condition}")
 st.info(f"Dropoff Weather: {dropoff_temp}°F | {dropoff_condition}")
 
-map_data = pd.DataFrame({
-    'lat': [p_lat, d_lat],
-    'lon': [p_lon, d_lon],
-    'location': ['Pickup', 'Dropoff'],
-    'address': [p_formatted or "Pickup Location", d_formatted or "Dropoff Location"],
-    'weather': [pickup_condition, dropoff_condition]
-})
-
-st.pydeck_chart(pdk.Deck(
-    map_style='mapbox://styles/mapbox/streets-v11',
-    initial_view_state=pdk.ViewState(
-        latitude=(p_lat + d_lat) / 2,
-        longitude=(p_lon + d_lon) / 2,
-        zoom=12,
-        pitch=45
-    ),
-    layers=[
-        pdk.Layer('ScatterplotLayer',
-                  data=map_data,
-                  get_position='[lon, lat]',
-                  get_color='[255, 0, 0]',
-                  get_radius=200),
-        pdk.Layer('TextLayer',
-                  data=map_data,
-                  get_position='[lon, lat]',
-                  get_text='location',
-                  get_color='[0,0,0]',
-                  get_size=16)
-    ],
-    tooltip={"text": "{location}: {address} | Weather: {weather}"}
-))
+# Display Map
+map_data = pd.DataFrame({'lat': [p_lat, d_lat], 'lon': [p_lon, d_lon]})
+st.map(map_data)
 
 if st.button("💲 Predict Fare"):
-    if None in [pickup_temp, pickup_condition, dropoff_temp, dropoff_condition]:
-        st.error("Missing weather data, please check inputs.")
+    if None in [pickup_temp, dropoff_temp]:
+        st.error("Incomplete weather data.")
     else:
-        pickup_factor = determine_weather_factor(pickup_condition)
-        dropoff_factor = determine_weather_factor(dropoff_condition)
-        weather_factor = (pickup_factor + dropoff_factor) / 2
+        actual_distance = get_distance((p_lat, p_lon), (d_lat, d_lon))
+        st.success(f"🗺️ Trip Distance: {actual_distance:.2f} miles")
+        # Adaptive weighted temperature & weather
+        pickup_weight = 0.5 if actual_distance == 0 else min(1, 5/actual_distance)
+        avg_temp = pickup_temp * pickup_weight + dropoff_temp * (1-pickup_weight)
+        weather_adj = weather_factor(pickup_cond)*pickup_weight + weather_factor(dropoff_cond)*(1-pickup_weight)
 
+        # Features array
         features = np.array([
             p_lat, p_lon, d_lat, d_lon, passenger_count, time.hour,
             date.day, date.month, date.year,
-            cityblock((40.7141667, -74.0063889), (p_lat, p_lon)),
-            cityblock((40.6441667, -73.7822222), (p_lat, p_lon)),
-            cityblock((40.6441667, -73.7822222), (d_lat, d_lon)),
-            cityblock((40.69, -74.175), (p_lat, p_lon)),
-            cityblock((40.69, -74.175), (d_lat, d_lon)),
-            cityblock((40.77, -73.87), (p_lat, p_lon)),
-            cityblock((40.77, -73.87), (d_lat, d_lon)),
-            d_lon - p_lon, d_lat - p_lat,
-            cityblock((p_lat, p_lon), (d_lat, d_lon)),
-            (pickup_temp + dropoff_temp) / 2
-        ]).reshape(1, -1)
-        base_fare = model.predict(features)[0]
-        fare = abs(base_fare) * (1 + 0.1*(passenger_count-1)) * weather_factor
-        st.success(f"✅ Predicted Fare: ${fare:.2f}")
+            cityblock((40.7141667,-74.0063889),(p_lat,p_lon)),
+            cityblock((40.6441667,-73.7822222),(p_lat,p_lon)),
+            cityblock((40.6441667,-73.7822222),(d_lat,d_lon)),
+            cityblock((40.69,-74.175),(p_lat,p_lon)),
+            cityblock((40.69,-74.175),(d_lat,d_lon)),
+            cityblock((40.77,-73.87),(p_lat,p_lon)),
+            cityblock((40.77,-73.87),(d_lat,d_lon)),
+            d_lon-p_lon, d_lat-p_lat, actual_distance, avg_temp
+        ]).reshape(1,-1)
 
+        base_fare = abs(model.predict(features)[0])
+        final_fare = base_fare*(1+0.1*(passenger_count-1))*weather_adj
+        st.success(f"✅ Predicted Fare: ${final_fare:.2f}")
