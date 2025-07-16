@@ -36,24 +36,21 @@ def get_location_by_address(address, api_key):
         st.error(f"Connection error: {e}")
         return None, None, None
 
-# Weather retrieval function using OpenWeatherMap API
-def weather(city, api_key):
+# Precise Weather retrieval function using OpenWeatherMap API with coordinates
+def weather_by_coordinates(lat, lon, api_key):
     try:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=imperial&appid={api_key.strip()}"
+        url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units=imperial&appid={api_key.strip()}"
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         weather_data = response.json()
-        location = f"{weather_data.get('name', 'Unknown')}, {weather_data['sys'].get('country', '')}"
         temperature = weather_data['main']['temp']
         condition = weather_data['weather'][0]['description'].title()
-        st.success(f"✅ Location: {location}")
-        st.info(f"🌡️ Temperature: {temperature} °F | ☁️ Condition: {condition}")
         return temperature, condition
     except Exception as e:
         st.error(f"Weather API error: {e}")
         return None, None
 
-# Weather-based fare adjustment
+# Comprehensive weather-based fare adjustment
 def determine_weather_factor(condition):
     condition = condition.lower()
     if "rain" in condition:
@@ -76,9 +73,6 @@ st.set_page_config(page_title="Uber Ride Price Prediction", layout="wide")
 st.image("uber.jpg")
 st.title("🚖 Uber Ride Price Prediction")
 
-city = st.text_input("🌎 Enter Your City (City,Country)", "New York,US")
-temperature, condition = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -89,22 +83,30 @@ with col2:
     passenger_count = st.selectbox("👥 Number of Passengers", range(1, 7))
 
 pickup_address = st.text_input("📍 Pickup Location")
-p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
+p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, api_key="YOUR_GOOGLE_API_KEY")
 
 p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 
 dropoff_address = st.text_input("📍 Dropoff Location")
-d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
+d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, api_key="YOUR_GOOGLE_API_KEY")
 
 d_lat = st.number_input("Dropoff Latitude", value=d_lat or 0.0, format="%.6f")
 d_lon = st.number_input("Dropoff Longitude", value=d_lon or 0.0, format="%.6f")
+
+# Fetching precise weather for both pickup and dropoff locations
+pickup_temp, pickup_condition = weather_by_coordinates(p_lat, p_lon, api_key="YOUR_OPENWEATHERMAP_API_KEY")
+dropoff_temp, dropoff_condition = weather_by_coordinates(d_lat, d_lon, api_key="YOUR_OPENWEATHERMAP_API_KEY")
+
+st.info(f"Pickup Weather: {pickup_temp}°F | {pickup_condition}")
+st.info(f"Dropoff Weather: {dropoff_temp}°F | {dropoff_condition}")
 
 map_data = pd.DataFrame({
     'lat': [p_lat, d_lat],
     'lon': [p_lon, d_lon],
     'location': ['Pickup', 'Dropoff'],
-    'address': [p_formatted or "Pickup Location", d_formatted or "Dropoff Location"]
+    'address': [p_formatted or "Pickup Location", d_formatted or "Dropoff Location"],
+    'weather': [pickup_condition, dropoff_condition]
 })
 
 st.pydeck_chart(pdk.Deck(
@@ -128,14 +130,17 @@ st.pydeck_chart(pdk.Deck(
                   get_color='[0,0,0]',
                   get_size=16)
     ],
-    tooltip={"text": "{location}: {address}"}
+    tooltip={"text": "{location}: {address} | Weather: {weather}"}
 ))
 
 if st.button("💲 Predict Fare"):
-    if None in [temperature, condition]:
-        st.error("Missing data, please check inputs.")
+    if None in [pickup_temp, pickup_condition, dropoff_temp, dropoff_condition]:
+        st.error("Missing weather data, please check inputs.")
     else:
-        weather_factor = determine_weather_factor(condition)
+        pickup_factor = determine_weather_factor(pickup_condition)
+        dropoff_factor = determine_weather_factor(dropoff_condition)
+        weather_factor = (pickup_factor + dropoff_factor) / 2
+
         features = np.array([
             p_lat, p_lon, d_lat, d_lon, passenger_count, time.hour,
             date.day, date.month, date.year,
@@ -148,7 +153,7 @@ if st.button("💲 Predict Fare"):
             cityblock((40.77, -73.87), (d_lat, d_lon)),
             d_lon - p_lon, d_lat - p_lat,
             cityblock((p_lat, p_lon), (d_lat, d_lon)),
-            temperature
+            (pickup_temp + dropoff_temp) / 2
         ]).reshape(1, -1)
         base_fare = model.predict(features)[0]
         fare = abs(base_fare) * (1 + 0.1*(passenger_count-1)) * weather_factor
