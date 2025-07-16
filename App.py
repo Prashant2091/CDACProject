@@ -300,7 +300,7 @@ if st.button("💲 Predict Fare"):
             cityblock((40.69,-74.175),(d_lat,d_lon)),
             cityblock((40.77,-73.87),(p_lat,p_lon)),
             cityblock((40.77,-73.87),(d_lat,d_lon)),
-            d_lon-p_lon, d_lat-p_lat, actual_distance, avg_temp
+            d_lon-p_lon, d_lat-p_lat, actual_distance, pickup_temp
         ]).reshape(1,-1)
 
         base_fare = abs(model.predict(features)[0])
