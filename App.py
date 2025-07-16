@@ -285,7 +285,7 @@ if st.button("💲 Predict Fare"):
         actual_distance = get_distance((p_lat, p_lon), (d_lat, d_lon))
         st.success(f"🗺️ Trip Distance: {actual_distance:.2f} miles")
         # Adaptive weighted temperature & weather
-        pickup_weight = 0.5 if actual_distance == 0 else min(1, 5/actual_distance)
+        pickup_weight = 0.5 
         avg_temp = pickup_temp * pickup_weight + dropoff_temp * (1-pickup_weight)
         weather_adj = determine_weather_factor(pickup_condition)*pickup_weight + determine_weather_factor(dropoff_condition)*(1-pickup_weight)
 
