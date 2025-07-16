@@ -87,7 +87,7 @@ passenger_count = st.selectbox("👥 Number of Passengers", range(1, 7))
 
 # Pickup and Dropoff locations
 pickup_address = st.text_input("📍 Pickup Location")
-p_lat, p_lon = get_location_by_address(pickup_address, api_key="YOUR_GOOGLE_API_KEY")
+p_lat, p_lon = get_location_by_address(pickup_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 if p_lat and p_lon:
     st.success(f"Pickup Coordinates: {p_lat}, {p_lon}")
 
@@ -95,7 +95,7 @@ p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 
 dropoff_address = st.text_input("📍 Dropoff Location")
-d_lat, d_lon = get_location_by_address(dropoff_address, api_key="YOUR_GOOGLE_API_KEY")
+d_lat, d_lon = get_location_by_address(dropoff_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 if d_lat and d_lon:
     st.success(f"Dropoff Coordinates: {d_lat}, {d_lon}")
 
