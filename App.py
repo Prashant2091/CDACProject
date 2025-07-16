@@ -1,4 +1,4 @@
-import streamlit as st
+'''import streamlit as st
 import numpy as np
 import pandas as pd
 import requests
@@ -161,9 +161,9 @@ if st.button("💲 Predict Fare"):
 
         base_fare = abs(model.predict(features)[0])
         final_fare = base_fare*(1+0.1*(passenger_count-1))*weather_adj
-        st.success(f"✅ Predicted Fare: ${final_fare:.2f}")
+        st.success(f"✅ Predicted Fare: ${final_fare:.2f}")'''
 
-'''import streamlit as st
+import streamlit as st
 import numpy as np
 import pandas as pd
 import requests
@@ -171,6 +171,7 @@ import datetime
 from scipy.spatial.distance import cityblock
 import pickle
 import pydeck as pdk
+from streamlit_geolocation import streamlit_geolocation
 
 # API compliance headers
 geo_headers = {
@@ -232,7 +233,10 @@ def determine_weather_factor(condition):
         return 1.0
     else:
         return 1.05
-
+# Haversine distance
+from geopy.distance import geodesic
+def get_distance(p1, p2):
+    return geodesic(p1, p2).miles
 # Streamlit UI
 st.set_page_config(page_title="Uber Ride Price Prediction", layout="wide")
 st.image("uber.jpg")
@@ -324,4 +328,3 @@ if st.button("💲 Predict Fare"):
         fare = abs(base_fare) * (1 + 0.1*(passenger_count-1)) * weather_factor
         st.success(f"✅ Predicted Fare: ${fare:.2f}")
 
-'''
