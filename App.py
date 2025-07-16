@@ -283,7 +283,7 @@ if st.button("💲 Predict Fare"):
         # Adaptive weighted temperature & weather
         pickup_weight = 0.5 if actual_distance == 0 else min(1, 5/actual_distance)
         avg_temp = pickup_temp * pickup_weight + dropoff_temp * (1-pickup_weight)
-        weather_adj = determine_weather_factor(pickup_cond)*pickup_weight + determine_weather_factor(dropoff_cond)*(1-pickup_weight)
+        weather_adj = determine_weather_factor(pickup_condition)*pickup_weight + determine_weather_factor(dropoff_condition)*(1-pickup_weight)
 
         # Features array
         features = np.array([
