@@ -75,7 +75,7 @@ st.image("uber.jpg")
 st.title("🚖 Uber Ride Price Prediction")
 
 city = st.text_input("🌎 Enter Your City (City,Country)", "New York,US")
-temperature, condition = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")
+temperature, condition = weather(city, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 
 # Pickup Date & Time
 date = st.date_input("📅 Pickup Date")
