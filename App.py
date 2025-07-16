@@ -282,27 +282,42 @@ if st.button("💲 Predict Fare"):
     if None in [pickup_temp, dropoff_temp]:
         st.error("Incomplete weather data.")
     else:
-        actual_distance = get_distance((p_lat, p_lon), (d_lat, d_lon))
-        st.success(f"🗺️ Trip Distance: {actual_distance:.2f} miles")
-        # Adaptive weighted temperature & weather
-        pickup_weight = 0.5 
-        avg_temp = pickup_temp * pickup_weight + dropoff_temp * (1-pickup_weight)
-        weather_adj = determine_weather_factor(pickup_condition)*pickup_weight + determine_weather_factor(dropoff_condition)*(1-pickup_weight)
+        # Recalculate original features precisely
+        dist_to_cent = cityblock((40.7141667,-74.0063889), (p_lat,p_lon))
+        pickup_dist_jfk = cityblock((40.6441667,-73.7822222), (p_lat,p_lon))
+        dropoff_dist_jfk = cityblock((40.6441667,-73.7822222), (d_lat,d_lon))
+        pickup_dist_ewr = cityblock((40.69,-74.175), (p_lat,p_lon))
+        dropoff_dist_ewr = cityblock((40.69,-74.175), (d_lat,d_lon))
+        pickup_dist_lgr = cityblock((40.77,-73.87), (p_lat,p_lon))
+        dropoff_dist_lgr = cityblock((40.77,-73.87), (d_lat,d_lon))
+        longitude_diff = d_lon - p_lon
+        latitude_diff = d_lat - p_lat
+        manhattan_distance = cityblock((p_lat,p_lon), (d_lat,d_lon))
 
-        # Features array
+        # Adaptive weighting for temp/weather
+        actual_distance = get_distance((p_lat, p_lon), (d_lat, d_lon))
+        pickup_weight = 0.5 if actual_distance == 0 else min(1, 5/actual_distance)
+        avg_temp = pickup_temp * pickup_weight + dropoff_temp * (1 - pickup_weight)
+        weather_adj = determine_weather_factor(pickup_condition) * pickup_weight + determine_weather_factor(dropoff_condition) * (1 - pickup_weight)
+
+        # Exactly match training features
         features = np.array([
             p_lat, p_lon, d_lat, d_lon, passenger_count, time.hour,
             date.day, date.month, date.year,
-            cityblock((40.7141667,-74.0063889),(p_lat,p_lon)),
-            cityblock((40.6441667,-73.7822222),(p_lat,p_lon)),
-            cityblock((40.6441667,-73.7822222),(d_lat,d_lon)),
-            cityblock((40.69,-74.175),(p_lat,p_lon)),
-            cityblock((40.69,-74.175),(d_lat,d_lon)),
-            cityblock((40.77,-73.87),(p_lat,p_lon)),
-            cityblock((40.77,-73.87),(d_lat,d_lon)),
-            d_lon-p_lon, d_lat-p_lat, actual_distance, pickup_temp
-        ]).reshape(1,-1)
+            dist_to_cent,
+            pickup_dist_jfk, dropoff_dist_jfk,
+            pickup_dist_ewr, dropoff_dist_ewr,
+            pickup_dist_lgr, dropoff_dist_lgr,
+            longitude_diff, latitude_diff,
+            manhattan_distance,
+            avg_temp
+        ]).reshape(1, -1)
 
+        # Fare calculation precisely matching training logic
         base_fare = abs(model.predict(features)[0])
-        final_fare = base_fare*(1+0.1*(passenger_count-1))*final_weather_factor
+        final_fare = base_fare * (1 + 0.1 * (passenger_count - 1)) * weather_adj
+
+        # Clearly display accurate results
         st.success(f"✅ Predicted Fare: ${final_fare:.2f}")
+        st.success(f"🗺️ Trip Distance: {actual_distance:.2f} miles")
+
