@@ -13,42 +13,41 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 model = pickle.load(open("model1.pkl", "rb"))
 
 def get_location_by_address(address):
-    search = requests.get("https://addresstogps.com/?address=" + address, headers=headers)
-    soup = BeautifulSoup(search.text, "html.parser")
-    lat = soup.find(attrs={"class": "form-control", "id": "lat"})
-    lon = soup.find(attrs={"class": "form-control", "id": "lon"})
-    if lat and lon:
-        return lat.get("value"), lon.get("value")
-    else:
+    try:
+        url = f'https://nominatim.openstreetmap.org/search?q={address}&format=json'
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        if data:
+            lat = data[0]['lat']
+            lon = data[0]['lon']
+            return float(lat), float(lon)
+        else:
+            st.warning(f"No location found for '{address}'. Please verify the address.")
+            return None, None
+    except requests.exceptions.RequestException as e:
+        st.error(f"Connection error while fetching coordinates: {e}")
         return None, None
 
-def weather(city):
-    city = city.replace(" ", "+")
-    res = requests.get(f'https://www.google.com/search?q={city}+weather', headers=headers)
-    soup = BeautifulSoup(res.text, 'html.parser')
+def weather(city, api_key="weather_api_lattest"):
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=imperial&appid={api_key}"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        weather_data = response.json()
 
-    location = soup.select_one('#wob_loc')
-    time_info = soup.select_one('#wob_dts')
-    weather_info = soup.select_one('#wob_tm')
+        location = weather_data['name']
+        temperature = weather_data['main']['temp']
+        condition = weather_data['weather'][0]['description'].title()
 
-    if location:
-        location = location.get_text().strip()
-    else:
-        location = "Location not found"
+        st.write(f"Location: {location}")
+        st.write(f"Temperature: {temperature} °F")
+        st.write(f"Condition: {condition}")
 
-    if time_info:
-        time_info = time_info.get_text().strip()
-    else:
-        time_info = "Time not found"
-
-    if weather_info:
-        weather_info = weather_info.get_text().strip()
-    else:
-        weather_info = "Weather not found"
-
-    st.write(location, time_info)
-    st.write("Temperature: ", weather_info + "°F")
-    return float(weather_info) if weather_info.isdigit() else None
+        return temperature
+    except requests.exceptions.RequestException as e:
+        st.error(f"Error retrieving weather: {e}")
+        return None
 
 
 # Title and Logo 
