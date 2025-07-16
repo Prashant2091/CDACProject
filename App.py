@@ -273,7 +273,11 @@ st.info(f"Dropoff Weather: {dropoff_temp}°F | {dropoff_condition}")
 # Display Map
 map_data = pd.DataFrame({'lat': [p_lat, d_lat], 'lon': [p_lon, d_lon]})
 st.map(map_data)
+pickup_weather_factor = determine_weather_factor(pickup_condition)
+dropoff_weather_factor = determine_weather_factor(dropoff_condition)
 
+# Average factor for better accuracy
+final_weather_factor = (pickup_weather_factor + dropoff_weather_factor) / 2
 if st.button("💲 Predict Fare"):
     if None in [pickup_temp, dropoff_temp]:
         st.error("Incomplete weather data.")
@@ -300,5 +304,5 @@ if st.button("💲 Predict Fare"):
         ]).reshape(1,-1)
 
         base_fare = abs(model.predict(features)[0])
-        final_fare = base_fare*(1+0.1*(passenger_count-1))*weather_adj
+        final_fare = base_fare*(1+0.1*(passenger_count-1))*final_weather_factor
         st.success(f"✅ Predicted Fare: ${final_fare:.2f}")
