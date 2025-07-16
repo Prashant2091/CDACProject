@@ -25,6 +25,7 @@ def get_location_by_address(address, api_key):
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
+
         if data['status'] == 'OK':
             location = data['results'][0]['geometry']['location']
             return location['lat'], location['lng']
@@ -75,7 +76,7 @@ st.image("uber.jpg")
 st.title("🚖 Uber Ride Price Prediction")
 
 city = st.text_input("🌎 Enter Your City (City,Country)", "New York,US")
-temperature, condition = weather(city, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
+temperature, condition = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")
 
 # Pickup Date & Time
 date = st.date_input("📅 Pickup Date")
