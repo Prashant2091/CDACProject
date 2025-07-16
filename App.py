@@ -29,7 +29,7 @@ def get_location_by_address(address):
         st.error(f"Connection error while fetching coordinates: {e}")
         return None, None
 
-def weather(city, api_key="weather_api_lattest"):
+def weather(city, api_key="eee5deb3c14edcdf56da66c7c517606b"):
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=imperial&appid={api_key}"
         response = requests.get(url, timeout=10)
