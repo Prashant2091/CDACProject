@@ -83,20 +83,20 @@ with col2:
     passenger_count = st.selectbox("👥 Number of Passengers", range(1, 7))
 
 pickup_address = st.text_input("📍 Pickup Location")
-p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, api_key="YOUR_GOOGLE_API_KEY")
+p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 
 p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 
 dropoff_address = st.text_input("📍 Dropoff Location")
-d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, api_key="YOUR_GOOGLE_API_KEY")
+d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 
 d_lat = st.number_input("Dropoff Latitude", value=d_lat or 0.0, format="%.6f")
 d_lon = st.number_input("Dropoff Longitude", value=d_lon or 0.0, format="%.6f")
 
 # Fetching precise weather for both pickup and dropoff locations
-pickup_temp, pickup_condition = weather_by_coordinates(p_lat, p_lon, api_key="YOUR_OPENWEATHERMAP_API_KEY")
-dropoff_temp, dropoff_condition = weather_by_coordinates(d_lat, d_lon, api_key="YOUR_OPENWEATHERMAP_API_KEY")
+pickup_temp, pickup_condition = weather_by_coordinates(p_lat, p_lon, api_key="665b90b40a24cf1e5d00fb6055c5b757")
+dropoff_temp, dropoff_condition = weather_by_coordinates(d_lat, d_lon, api_key="665b90b40a24cf1e5d00fb6055c5b757")
 
 st.info(f"Pickup Weather: {pickup_temp}°F | {pickup_condition}")
 st.info(f"Dropoff Weather: {dropoff_temp}°F | {dropoff_condition}")
