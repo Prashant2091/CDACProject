@@ -19,22 +19,22 @@ model = pickle.load(open("model1.pkl", "rb"))
 def get_location_by_address(address, api_key):
     if not address.strip():
         st.warning("Address field is empty.")
-        return None, None
+        return None, None, None
     try:
         url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}'
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-
         if data['status'] == 'OK':
             location = data['results'][0]['geometry']['location']
-            return location['lat'], location['lng']
+            formatted_address = data['results'][0]['formatted_address']
+            return location['lat'], location['lng'], formatted_address
         else:
             st.warning(f"Google Geocoding Error: {data['status']} for '{address}'")
-            return None, None
+            return None, None, None
     except requests.exceptions.RequestException as e:
         st.error(f"Connection error: {e}")
-        return None, None
+        return None, None, None
 
 # Weather retrieval function using OpenWeatherMap API
 def weather(city, api_key):
@@ -53,7 +53,7 @@ def weather(city, api_key):
         st.error(f"Weather API error: {e}")
         return None, None
 
-# Comprehensive weather-based fare adjustment
+# Weather-based fare adjustment
 def determine_weather_factor(condition):
     condition = condition.lower()
     if "rain" in condition:
@@ -72,38 +72,41 @@ def determine_weather_factor(condition):
         return 1.05
 
 # Streamlit UI
+st.set_page_config(page_title="Uber Ride Price Prediction", layout="wide")
 st.image("uber.jpg")
 st.title("🚖 Uber Ride Price Prediction")
 
 city = st.text_input("🌎 Enter Your City (City,Country)", "New York,US")
 temperature, condition = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")
 
-# Pickup Date & Time
-date = st.date_input("📅 Pickup Date")
-time = st.time_input("⏰ Pickup Time", datetime.time(0, 0))
-st.info(f"Pickup Date & Time: {date} at {time}")
+col1, col2 = st.columns(2)
 
-# Passenger Count
-passenger_count = st.selectbox("👥 Number of Passengers", range(1, 7))
+with col1:
+    date = st.date_input("📅 Pickup Date")
+    time = st.time_input("⏰ Pickup Time", datetime.time(0, 0))
 
-# Pickup and Dropoff locations
+with col2:
+    passenger_count = st.selectbox("👥 Number of Passengers", range(1, 7))
+
 pickup_address = st.text_input("📍 Pickup Location")
-p_lat, p_lon = get_location_by_address(pickup_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
-if p_lat and p_lon:
-    st.success(f"Pickup Coordinates: {p_lat}, {p_lon}")
+p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, api_key="YOUR_GOOGLE_API_KEY")
 
 p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 
 dropoff_address = st.text_input("📍 Dropoff Location")
-d_lat, d_lon = get_location_by_address(dropoff_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
-if d_lat and d_lon:
-    st.success(f"Dropoff Coordinates: {d_lat}, {d_lon}")
+d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, api_key="YOUR_GOOGLE_API_KEY")
 
 d_lat = st.number_input("Dropoff Latitude", value=d_lat or 0.0, format="%.6f")
 d_lon = st.number_input("Dropoff Longitude", value=d_lon or 0.0, format="%.6f")
 
-# Map Visualization
+map_data = pd.DataFrame({
+    'lat': [p_lat, d_lat],
+    'lon': [p_lon, d_lon],
+    'location': ['Pickup', 'Dropoff'],
+    'address': [p_formatted or "Pickup Location", d_formatted or "Dropoff Location"]
+})
+
 st.pydeck_chart(pdk.Deck(
     map_style='mapbox://styles/mapbox/streets-v11',
     initial_view_state=pdk.ViewState(
@@ -114,20 +117,20 @@ st.pydeck_chart(pdk.Deck(
     ),
     layers=[
         pdk.Layer('ScatterplotLayer',
-                  data=pd.DataFrame({'lat': [p_lat, d_lat], 'lon': [p_lon, d_lon]}),
+                  data=map_data,
                   get_position='[lon, lat]',
                   get_color='[255, 0, 0]',
                   get_radius=200),
         pdk.Layer('TextLayer',
-                  data=pd.DataFrame({'lat': [p_lat, d_lat], 'lon': [p_lon, d_lon], 'text': ['Pickup', 'Dropoff']}),
+                  data=map_data,
                   get_position='[lon, lat]',
-                  get_text='text',
+                  get_text='location',
                   get_color='[0,0,0]',
                   get_size=16)
-    ]
+    ],
+    tooltip={"text": "{location}: {address}"}
 ))
 
-# Fare Prediction Button
 if st.button("💲 Predict Fare"):
     if None in [temperature, condition]:
         st.error("Missing data, please check inputs.")
@@ -150,3 +153,5 @@ if st.button("💲 Predict Fare"):
         base_fare = model.predict(features)[0]
         fare = abs(base_fare) * (1 + 0.1*(passenger_count-1)) * weather_factor
         st.success(f"✅ Predicted Fare: ${fare:.2f}")
+
+st.markdown("[Book Your Ride on Uber](https://www.uber.com)")
