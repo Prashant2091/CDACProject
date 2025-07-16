@@ -15,19 +15,21 @@ geo_headers = {
 model = pickle.load(open("model1.pkl", "rb"))
 
 # Robust geolocation function using OpenStreetMap Nominatim API
-def get_location_by_address(address):
+def get_location_by_address(address, api_key):
     if not address.strip():
         st.warning("Address field is empty.")
         return None, None
     try:
-        url = f'https://nominatim.openstreetmap.org/search?q={address}&format=json'
-        response = requests.get(url, headers=geo_headers, timeout=10)
+        url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}'
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        if data:
-            return float(data[0]['lat']), float(data[0]['lon'])
+
+        if data['status'] == 'OK':
+            location = data['results'][0]['geometry']['location']
+            return location['lat'], location['lng']
         else:
-            st.warning(f"No coordinates found for '{address}'.")
+            st.warning(f"Google Geocoding Error: {data['status']} for '{address}'")
             return None, None
     except requests.exceptions.RequestException as e:
         st.error(f"Connection error: {e}")
@@ -62,7 +64,7 @@ st.image("uber.jpg")
 st.title("🚖 Uber Ride Price Prediction")
 
 st.markdown("### 🌎 Enter Your City Name")
-st.markdown("_Use format: **City,Country_Code** (e.g., Jhansi,IN, Paris,FR)_")
+#st.markdown("_Use format: **City,Country_Code** (e.g., Jhansi,IN, Paris,FR)_")
 city = st.text_input("City", "New York,US")
 temperature = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")
 
@@ -77,17 +79,23 @@ st.info(f"Passengers: {passenger_count}")
 
 # Pickup Location
 pickup_address = st.text_input("📍 Pickup Location")
-p_lat, p_lon = get_location_by_address(pickup_address)
+p_lat, p_lon = get_location_by_address(pickup_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 if p_lat and p_lon:
     st.success(f"Pickup Coordinates: {p_lat}, {p_lon}")
+else:
+    st.warning("Enter pickup coordinates manually.")
+
 p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 
 # Dropoff Location
 dropoff_address = st.text_input("📍 Dropoff Location")
-d_lat, d_lon = get_location_by_address(dropoff_address)
+d_lat, d_lon = get_location_by_address(dropoff_address, api_key="AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 if d_lat and d_lon:
     st.success(f"Dropoff Coordinates: {d_lat}, {d_lon}")
+else:
+    st.warning("Enter dropoff coordinates manually.")
+
 d_lat = st.number_input("Dropoff Latitude", value=d_lat or 0.0, format="%.6f")
 d_lon = st.number_input("Dropoff Longitude", value=d_lon or 0.0, format="%.6f")
 
