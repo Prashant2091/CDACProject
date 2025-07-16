@@ -7,3 +7,4 @@ requests==2.28.1
 scipy==1.9.1
 streamlit==1.13.0
 streamlit_geolocation
+geodesic
