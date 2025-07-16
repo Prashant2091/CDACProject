@@ -88,7 +88,7 @@ if use_live:
 else:
     pickup_address = st.text_input("📍 Pickup Location")
 if pickup_address.strip():
-    p_lat, p_lon, p_formatted = get_location(pickup_address, "AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
+    p_lat, p_lon, p_formatted = get_location_by_address(pickup_address, "AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 else:
     p_lat = p_lon = p_formatted = None
     st.warning("Please enter a valid pickup location.")
@@ -96,7 +96,7 @@ p_lat = st.number_input("Pickup Latitude", value=p_lat or 0.0, format="%.6f")
 p_lon = st.number_input("Pickup Longitude", value=p_lon or 0.0, format="%.6f")
 dropoff_address = st.text_input("📍 Dropoff Location")
 if dropoff_address.strip():
-    d_lat, d_lon, d_formatted = get_location(dropoff_address, "AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
+    d_lat, d_lon, d_formatted = get_location_by_address(dropoff_address, "AIzaSyCapre4-pQ70FiV5EPMpIvs7TPbFzU1bAQ")
 else:
     d_lat = d_lon = d_formatted = None
     st.warning("Please enter a valid dropoff location.")
@@ -106,8 +106,8 @@ d_lon = st.number_input("Dropoff Longitude", value=d_lon or 0.0, format="%.6f")
 
 
 # Fetch weather for pickup/dropoff
-pickup_temp, pickup_cond = weather(p_lat, p_lon, "665b90b40a24cf1e5d00fb6055c5b757")
-dropoff_temp, dropoff_cond = weather(d_lat, d_lon, "665b90b40a24cf1e5d00fb6055c5b757")
+pickup_temp, pickup_cond = weather_by_coordinates(p_lat, p_lon, "665b90b40a24cf1e5d00fb6055c5b757")
+dropoff_temp, dropoff_cond = weather_by_coordinates(d_lat, d_lon, "665b90b40a24cf1e5d00fb6055c5b757")
 st.info(f"Pickup Weather: {pickup_temp}°F, {pickup_cond}")
 st.info(f"Dropoff Weather: {dropoff_temp}°F, {dropoff_cond}")
 
