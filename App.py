@@ -63,7 +63,7 @@ st.title("Uber Ride Price Prediction Using Multiple Factors")
 
 # Live Weather
 city = st.text_input("Enter Your City Name:", "New York")
-temperature = weather(city, api_key="eee5deb3c14edcdf56da66c7c517606b")  # Replace with your actual API key
+temperature = weather(city, api_key="665b90b40a24cf1e5d00fb6055c5b757")  # Replace with your actual API key
 
 # Date and Time Input
 date = st.date_input("Date of Pickup")
